@@ -4,12 +4,12 @@ import React from "react";
 import {
   Sheet,
   SheetContent,
-  SheetFooter,
+  // SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import { Separator } from "../ui/separator";
+// import { Separator } from "../ui/separator";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -105,7 +105,7 @@ export const Navbar = () => {
               </div>
             </div>
 
-            <SheetFooter className="flex-col sm:flex-col justify-start items-start">
+            {/* <SheetFooter className="flex-col sm:flex-col justify-start items-start">
               <Separator className="mb-2" />
               <Button
                 asChild
@@ -117,8 +117,8 @@ export const Navbar = () => {
                   Register now
                 </Link>
               </Button>
-              {/* <ToggleTheme /> */}
-            </SheetFooter>
+              <ToggleTheme />
+            </SheetFooter> */}
           </SheetContent>
         </Sheet>
       </div>
@@ -138,10 +138,7 @@ export const Navbar = () => {
         </NavigationMenuList>
       </NavigationMenu>
 
-      <div className="hidden lg:flex items-center">
-        {/* <ToggleTheme /> */}
-        {/* <Button asChild size="sm" variant="default" aria-label="View on GitHub" className="bg-pink-600"> */}
-        {/* <InstagramIcon className="text-white" /> */}
+      {/* <div className="hidden lg:flex items-center">
         <Button
           asChild
           size="sm"
@@ -152,8 +149,7 @@ export const Navbar = () => {
             Register now
           </Link>
         </Button>
-        {/* </Button> */}
-      </div>
+      </div> */}
     </header>
   );
 };
