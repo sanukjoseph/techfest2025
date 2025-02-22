@@ -1,45 +1,53 @@
 "use client";
 
 import * as React from "react";
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import Link from "next/link";
-// import { eventDetails } from "@/lib/eventList";
 import Image from "next/image";
+import { Tables } from "@/lib/supabase/types";
 
-const imgWidth = 300;
-const imgHeight: number = 200;
+type Event = Tables<"events">;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function EventCarousel({ allEvents }: any) {
-// export function EventCarousel({ allEvents }: { allEvents: { data: Array<{ id: string; name: string; image_url: string }> } }) {
+interface EventCarouselProps {
+  data?: Event[];
+}
 
+export function EventCarousel({ data }: EventCarouselProps) {
   return (
     <Carousel
       opts={{
-        align: "start",
+        align: "center", // Center the carousel items
+        loop: true, // Enable infinite loop
       }}
       plugins={[
         Autoplay({
-          delay: 2000,
+          delay: 3000, // Autoplay delay
         }),
       ]}
       className="w-full max-w-full"
     >
       <CarouselContent>
-        {allEvents?.data?.map((event: { id: string; name: string; image_url: string }, index: number) => (
-          <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/4 w-fit">
-            <div className="p-1">
-              <Card className="border-0">
-                <CardContent className="flex aspect-square items-center justify-center p-2">
-                  {/* <span className="text-3xl font-semibold">{index + 1}</span> */}
-                  <Link href={`/events/${event.id}`} className="relative">
-                    {/* <h1 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center font-bold text-pink-500 font-gameOfSquid shadow-xl text-4xl">
-                      {event.name}
-                    </h1> */}
-                    <Image width={imgWidth} height={imgHeight} src={event.image_url} alt={event.name} className="w-full object-contain rounded-md" />
+        {data?.map((event: Event) => (
+          <CarouselItem key={event.id} className="basis-full sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+            <div className="p-1 flex justify-center">
+              {" "}
+              {/* Center the card */}
+              <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 w-full max-w-[300px]">
+                <CardContent className="flex aspect-square items-center justify-center p-2 relative">
+                  <Link href={`/events/${event.id}`} className="relative w-full h-full">
+                    {/* Event Image */}
+                    <Image
+                      src={event.image_url || "/default-image.jpg"}
+                      alt={event.name || "Event"}
+                      fill
+                      className="object-cover rounded-md"
+                    />
+                    {/* Event Name Overlay */}
+                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-md">
+                      <h1 className="text-white text-2xl font-bold text-center px-2">{event.name}</h1>
+                    </div>
                   </Link>
                 </CardContent>
               </Card>
@@ -47,8 +55,6 @@ export function EventCarousel({ allEvents }: any) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      {/* <CarouselPrevious />
-      <CarouselNext /> */}
     </Carousel>
   );
 }

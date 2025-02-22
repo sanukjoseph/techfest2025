@@ -1,8 +1,15 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { SlidingNumber } from "@/components/ui/sliding-number";
 
-const CountdownTimer = ({ targetDate, className, subClassname }: { targetDate: string; className: string; subClassname: string; }) => {
+interface CountdownTimerProps {
+  targetDate: string;
+  className: string;
+  subClassname: string;
+}
+
+const CountdownTimer = ({ targetDate, className, subClassname }: CountdownTimerProps) => {
   const calculateTimeLeft = useCallback(() => {
     const difference = new Date(targetDate).getTime() - new Date().getTime();
     if (difference > 0) {
@@ -34,11 +41,8 @@ const CountdownTimer = ({ targetDate, className, subClassname }: { targetDate: s
         { label: "Min", value: timeLeft.minutes },
         { label: "Sec", value: timeLeft.seconds },
       ].map((time, index) => (
-        <div
-          key={index}
-          className={subClassname}
-        >
-          <span className="text-lg md:text-3xl font-semibold">{time.value}</span>
+        <div key={index} className={subClassname}>
+          <SlidingNumber value={time.value} padStart={true} />
           <p className="md:text-xs text-gray-400">{time.label}</p>
         </div>
       ))}
