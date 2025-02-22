@@ -10,7 +10,6 @@ import AboutUs from "@/components/home/AboutUs";
 import CountDownSection from "@/components/home/CountDownSection";
 import { FAQSection } from "@/components/home/FAQSection";
 import FeaturedEvents from "@/components/home/FeaturedEvents";
-import Footer from "@/components/home/Footer";
 import HeroSection from "@/components/home/HeroSection";
 
 // export default async function Home() {
@@ -63,7 +62,6 @@ export default function Home() {
       <CountDownSection />
       <AboutUs />
       <FAQSection />
-      <Footer />
     </div>
   );
 }

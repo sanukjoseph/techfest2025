@@ -159,128 +159,193 @@ const AttendeeForm = ({ eventId, isGroupEvent, price }: AttendeeFormProps) => {
   }, [price, form]);
 
   return (
-    <Card className="max-w-3xl mx-auto">
+    <Card className="max-w-3xl mx-auto bg-gray-900 border-gray-800 shadow-lg">
       <CardHeader>
-        <CardTitle className="text-2xl">Event Registration</CardTitle>
-        <CardDescription>Fill out the form below to register for the event.</CardDescription>
+        <CardTitle className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+          Event Registration
+        </CardTitle>
+        <CardDescription className="text-gray-400">Fill out the form below to register for the event.</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Full Name */}
             <FormField
               control={form.control}
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel className="text-gray-300">Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Full Name" {...field} disabled={isPending} />
+                    <Input
+                      placeholder="Full Name"
+                      {...field}
+                      disabled={isPending}
+                      className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder-gray-500"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
+
+            {/* College Name */}
             <FormField
               control={form.control}
               name="college_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>College Name</FormLabel>
+                  <FormLabel className="text-gray-300">College Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="College Name" {...field} disabled={isPending} />
+                    <Input
+                      placeholder="College Name"
+                      {...field}
+                      disabled={isPending}
+                      className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder-gray-500"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
+
+            {/* Department */}
             <FormField
               control={form.control}
               name="department"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Department</FormLabel>
+                  <FormLabel className="text-gray-300">Department</FormLabel>
                   <FormControl>
-                    <Input placeholder="Department" {...field} disabled={isPending} />
+                    <Input
+                      placeholder="Department"
+                      {...field}
+                      disabled={isPending}
+                      className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder-gray-500"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
+
+            {/* Email */}
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-gray-300">Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="Email" type="email" {...field} disabled={isPending} />
+                    <Input
+                      placeholder="Email"
+                      type="email"
+                      {...field}
+                      disabled={isPending}
+                      className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder-gray-500"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
+
+            {/* Phone Number */}
             <FormField
               control={form.control}
               name="phone_no"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
+                  <FormLabel className="text-gray-300">Phone Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Phone Number" type="tel" {...field} disabled={isPending} />
+                    <Input
+                      placeholder="Phone Number"
+                      type="tel"
+                      {...field}
+                      disabled={isPending}
+                      className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder-gray-500"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
+
+            {/* University Registration Number */}
             <FormField
               control={form.control}
               name="university_reg_no"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>University Registration Number</FormLabel>
+                  <FormLabel className="text-gray-300">University Registration Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="University Registration Number" {...field} disabled={isPending} />
+                    <Input
+                      placeholder="University Registration Number"
+                      {...field}
+                      disabled={isPending}
+                      className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder-gray-500"
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
 
+            {/* Group Member IDs (if applicable) */}
             {eventId && isGroupEvent && (
               <FormField
                 control={form.control}
                 name="group_member_ids"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Group Member IDs (comma-separated)</FormLabel>
+                    <FormLabel className="text-gray-300">Group Member IDs (comma-separated)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter 3-digit IDs of group members" {...field} disabled={isPending} />
+                      <Input
+                        placeholder="Enter 3-digit IDs of group members"
+                        {...field}
+                        disabled={isPending}
+                        className="bg-gray-800/50 border-gray-700 text-gray-200 placeholder-gray-500"
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
             )}
 
+            {/* Payment Error Alert */}
             {requiresPayment && paymentError && (
-              <Alert variant="destructive">
-                <AlertDescription>{paymentError}</AlertDescription>
+              <Alert variant="destructive" className="bg-red-900/50 border-red-800">
+                <AlertDescription className="text-red-300">{paymentError}</AlertDescription>
               </Alert>
             )}
 
             {/* Conditional Button Rendering */}
             {requiresPayment ? (
               paymentId ? (
-                <Button type="submit" disabled={isPending} className="w-full">
+                <Button
+                  type="submit"
+                  disabled={isPending}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+                >
                   Complete Registration
                 </Button>
               ) : (
-                <Button type="button" onClick={handlePayment} disabled={isPending} className="w-full">
+                <Button
+                  type="button"
+                  onClick={handlePayment}
+                  disabled={isPending}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+                >
                   {isPending ? "Processing Payment..." : "Register and Pay"}
                 </Button>
               )
             ) : (
-              <Button type="submit" disabled={isPending} className="w-full">
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
+              >
                 Complete Registration
               </Button>
             )}

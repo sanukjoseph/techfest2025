@@ -9,7 +9,7 @@ const FeaturedEvents = async () => {
 
   return (
     <section className="px-4 py-12" id="events">
-      <div className="container mx-auto">
+      <div className="mx-auto">
         {/* Heading */}
         <h1
           className={`${squidgame.className} text-center text-4xl sm:text-5xl md:text-6xl font-bold mb-12 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent`}
