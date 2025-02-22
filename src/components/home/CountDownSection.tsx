@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React from "react";
-import CountdownTimer from "../layout/CountDownTimer";
+import CountdownTimer from "./CountDownTimer";
 import { Button } from "../ui/button";
 import { squidgame } from "@/app/styles/fonts";
 import Link from "next/link";

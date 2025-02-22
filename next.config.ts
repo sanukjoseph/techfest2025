@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        port: "", // Leave empty if no specific port is required
-        pathname: "/**", // Allow all paths under this hostname
+        port: "",
+        pathname: "/**",
       },
       {
         protocol: "https",
@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "bvqdbtexwypbnmbqfetb.supabase.co",
+        hostname: "uwixcckicerfnghoqkae.supabase.co",
         port: "",
         pathname: "/**",
       },

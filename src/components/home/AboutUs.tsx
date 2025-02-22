@@ -6,13 +6,10 @@ export default function AboutUs() {
     <section
       id="about"
       className="py-20 relative w-full min-h-fit bg-cover bg-center flex flex-col items-center justify-center px-6 md:px-12 lg:px-24"
-      style={{ backgroundImage: "url('/about-bg.jpg')" }} // Add a background image
+      // style={{ backgroundImage: "url('/about-bg.jpg')" }} // Add a background image
     >
-      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50"></div>
-
       <div className="relative z-10 text-white flex flex-col items-center w-full max-w-7xl">
-        {/* Text Content - Centered Horizontally */}
         <div className="max-w-3xl text-gray-300 flex flex-col">
           <h2
             className={`${squidgame.className} text-4xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent animate-gradient`}
@@ -32,16 +29,9 @@ export default function AboutUs() {
             future of tech!
           </p>
         </div>
-
-        {/* Logos - Positioned Below the Text */}
         <div className="mt-12 flex flex-row items-center gap-8 md:gap-12">
           <div className="relative w-40 md:w-52 h-40 md:h-52 hover:scale-105 transition-transform duration-300">
-            <Image
-              src="/sjcet.png" // Replace with correct logo path
-              alt="St. Joseph's College of Engineering and Technology"
-              fill
-              className="object-contain"
-            />
+            <Image src="/sjcet.png" alt="St. Joseph's College of Engineering and Technology" fill className="object-contain" />
           </div>
           <div className="relative w-40 md:w-52 h-40 md:h-52 hover:scale-105 transition-transform duration-300">
             <Image src="/smash.png" alt="SMASH" fill className="object-contain" />

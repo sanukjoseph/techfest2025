@@ -38,11 +38,9 @@ export function EventCarousel({ data }: EventCarouselProps) {
                       <Image
                         src={event.image_url || "/default-image.jpg"}
                         alt={event.name || "Event"}
-                        layout="responsive"
                         width={500}
                         height={300}
-                        objectFit="contain"
-                        className="rounded-md"
+                        className="rounded-md object-contain"
                       />
                     </div>
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 rounded-md">

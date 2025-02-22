@@ -1,14 +1,24 @@
 import { z } from "zod";
 
 export const attendeeSchema = z.object({
-  full_name: z.string().min(3, "Full name must be at least 3 characters"),
-  college_name: z.string().min(3, "College name must be at least 3 characters"),
-  department: z.string().min(3, "Department must be at least 3 characters"),
+  full_name: z.string().nonempty("Full name is required"),
+  college_name: z.string().nonempty("College name is required"),
+  department: z.string().nonempty("Department is required"),
   email: z.string().email("Invalid email address"),
-  phone_no: z.string().min(10, "Phone number must be at least 10 characters"),
-  university_reg_no: z.string().min(3, "University registration number must be at least 3 characters"),
-  group_member_ids: z.string().optional(),
-  payment_id: z.string().nullable().optional(),
+  phone_no: z.string().nonempty("Phone number is required"),
+  payment_id: z.string().nullable(),
+  event_id: z.string().nonempty("Event ID is required"),
+  group_members: z
+    .array(
+      z.object({
+        full_name: z.string().nonempty("Full name is required"),
+        college_name: z.string().nonempty("College name is required"),
+        department: z.string().nonempty("Department is required"),
+        email: z.string().email("Invalid email address"),
+        phone_no: z.string().nonempty("Phone number is required"),
+      }),
+    )
+    .optional(),
 });
 
 export type AttendeeFormData = z.infer<typeof attendeeSchema>;

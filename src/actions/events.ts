@@ -14,16 +14,6 @@ const deleteEventSchema = z.object({
   id: z.string().uuid(),
 });
 
-const updateAttendeeWinningPositionSchema = z.object({
-  eventId: z.string().uuid(),
-  winnerPositions: z.array(
-    z.object({
-      attendeeId: z.string().length(3),
-      position: z.number().min(1),
-    }),
-  ),
-});
-
 const EVENTFORMROUTE = "/create";
 
 export const getEvents = ServeractionClient.action(async ({ ctx }) => {
@@ -99,7 +89,9 @@ export const createEvent = ServeractionClient.schema(createEventSchema).action(a
       event_type: parsedInput.event_type,
       category: parsedInput.category,
       format: parsedInput.format,
-      num_winners: parsedInput.num_winners,
+      min_group_size: parsedInput.min_group_size,
+      max_group_size: parsedInput.max_group_size,
+      active: parsedInput.active,
     });
 
     if (eventInsertError) {
@@ -114,7 +106,23 @@ export const createEvent = ServeractionClient.schema(createEventSchema).action(a
 });
 
 export const updateEvent = ServeractionClient.schema(updateEventSchema).action(
-  async ({ parsedInput: { id, name, description, price, event_limit, image_url, event_type, category, format, num_winners }, ctx }) => {
+  async ({
+    parsedInput: {
+      id,
+      name,
+      description,
+      price,
+      event_limit,
+      image_url,
+      event_type,
+      category,
+      format,
+      min_group_size,
+      max_group_size,
+      active,
+    },
+    ctx,
+  }) => {
     const { supabase, user } = ctx;
     if (!user?.id) return { message: "Unauthorized", type: "error" };
 
@@ -126,7 +134,7 @@ export const updateEvent = ServeractionClient.schema(updateEventSchema).action(
 
       const { error } = await supabase
         .from("events")
-        .update({ name, description, price, event_limit, image_url, event_type, category, format, num_winners })
+        .update({ name, description, price, event_limit, image_url, event_type, category, format, min_group_size, max_group_size, active })
         .eq("id", id);
       if (error) throw error;
 
@@ -159,63 +167,3 @@ export const deleteEvent = ServeractionClient.schema(deleteEventSchema).action(a
     return { message: "Failed to delete event", type: "error" };
   }
 });
-
-export const updateAttendeeWinningPosition = ServeractionClient.schema(updateAttendeeWinningPositionSchema).action(
-  async ({ parsedInput: { eventId, winnerPositions }, ctx }) => {
-    const { supabase, user } = ctx;
-    if (!user?.id) return { message: "Unauthorized", type: "error" };
-
-    try {
-      for (const winnerPosition of winnerPositions) {
-        const { attendeeId, position } = winnerPosition;
-
-        // Fetch the attendee to check if they exist and belong to the event
-        const { data: attendee, error: fetchError } = await supabase
-          .from("attendees")
-          .select("*")
-          .eq("event_id", eventId)
-          .eq("attendee_id", attendeeId)
-          .single();
-
-        if (fetchError || !attendee) {
-          console.error(`Attendee with ID ${attendeeId} not found in event ${eventId}`);
-          return { message: `Attendee with ID ${attendeeId} not found in event ${eventId}`, type: "error" };
-        }
-
-        // If the event is a group event, update all group members
-        if (attendee.group_member_ids) {
-          const groupMemberIds = attendee.group_member_ids.split(",");
-          for (const memberId of groupMemberIds) {
-            const { error: updateError } = await supabase
-              .from("attendees")
-              .update({ winning_position: position })
-              .eq("event_id", eventId)
-              .eq("attendee_id", memberId);
-
-            if (updateError) {
-              console.error(`Error updating winning position for attendee ${memberId}:`, updateError);
-              return { message: `Failed to update winning position for attendee ${memberId}`, type: "error" };
-            }
-          }
-        } else {
-          const { error: updateError } = await supabase
-            .from("attendees")
-            .update({ winning_position: position })
-            .eq("event_id", eventId)
-            .eq("attendee_id", attendeeId);
-
-          if (updateError) {
-            console.error(`Error updating winning position for attendee ${attendeeId}:`, updateError);
-            return { message: `Failed to update winning position for attendee ${attendeeId}`, type: "error" };
-          }
-        }
-      }
-
-      revalidatePath(`/events/${eventId}`);
-      return { message: "Competition results updated successfully", type: "success" };
-    } catch (error) {
-      console.error("Error updating competition results:", error);
-      return { message: "Failed to update competition results", type: "error" };
-    }
-  },
-);

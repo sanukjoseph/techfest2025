@@ -13,13 +13,9 @@ export interface Database {
           email: string | null;
           phone_no: string | null;
           school_id: string | null;
-          university_reg_no: string | null;
           attendee_id: string | null;
-          general_pass: boolean | null;
-          group_member_ids: string | null;
-          winning_position: number | null;
           payment_id: string | null;
-          event_ids: string[] | null;
+          event_id: string | null;
         };
         Insert: {
           id?: string;
@@ -30,13 +26,9 @@ export interface Database {
           email?: string | null;
           phone_no?: string | null;
           school_id?: string | null;
-          university_reg_no?: string | null;
           attendee_id?: string | null;
-          general_pass?: boolean | null;
-          group_member_ids?: string | null;
-          winning_position?: number | null;
           payment_id?: string | null;
-          event_ids?: string[] | null;
+          event_id?: string | null;
         };
         Update: {
           id?: string;
@@ -47,64 +39,73 @@ export interface Database {
           email?: string | null;
           phone_no?: string | null;
           school_id?: string | null;
-          university_reg_no?: string | null;
           attendee_id?: string | null;
-          general_pass?: boolean | null;
-          group_member_ids?: string | null;
-          winning_position?: number | null;
           payment_id?: string | null;
-          event_ids?: string[] | null;
+          event_id?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "attendees_event_id_fkey";
+            columns: ["event_id"];
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       events: {
         Row: {
           id: string;
-          created_at: string;
-          name: string | null;
-          description: string | null;
-          price: number | null;
-          event_limit: number | null;
-          image_url: string | null;
-          user_id: string;
-          event_type: string | null;
+          active: boolean | null;
           category: string | null;
+          created_at: string;
+          description: string | null;
+          event_limit: number | null;
+          event_type: string | null;
           format: string | null;
-          num_winners: number | null;
-          min_group_size: number | null;
+          image_url: string | null;
           max_group_size: number | null;
+          min_group_size: number | null;
+          name: string | null;
+          num_winners: number | null;
+          price: number | null;
+          registration_count: number | null;
+          user_id: string;
         };
         Insert: {
           id?: string;
-          created_at?: string;
-          name?: string | null;
-          description?: string | null;
-          price?: number | null;
-          event_limit?: number | null;
-          image_url?: string | null;
-          user_id: string;
-          event_type?: string | null;
+          active?: boolean | null;
           category?: string | null;
+          created_at?: string;
+          description?: string | null;
+          event_limit?: number | null;
+          event_type?: string | null;
           format?: string | null;
-          num_winners?: number | null;
-          min_group_size?: number | null;
+          image_url?: string | null;
           max_group_size?: number | null;
+          min_group_size?: number | null;
+          name?: string | null;
+          num_winners?: number | null;
+          price?: number | null;
+          registration_count?: number | null;
+          user_id: string;
         };
         Update: {
           id?: string;
-          created_at?: string;
-          name?: string | null;
-          description?: string | null;
-          price?: number | null;
-          event_limit?: number | null;
-          image_url?: string | null;
-          user_id?: string;
-          event_type?: string | null;
+          active?: boolean | null;
           category?: string | null;
+          created_at?: string;
+          description?: string | null;
+          event_limit?: number | null;
+          event_type?: string | null;
           format?: string | null;
-          num_winners?: number | null;
-          min_group_size?: number | null;
+          image_url?: string | null;
           max_group_size?: number | null;
+          min_group_size?: number | null;
+          name?: string | null;
+          num_winners?: number | null;
+          price?: number | null;
+          registration_count?: number | null;
+          user_id?: string;
         };
         Relationships: [
           {
@@ -118,27 +119,27 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          updated_at: string;
-          username: string | null;
-          full_name: string | null;
           avatar_url: string | null;
           email: string;
+          full_name: string | null;
+          updated_at: string;
+          username: string | null;
         };
         Insert: {
           id: string;
-          updated_at?: string;
-          username?: string | null;
-          full_name?: string | null;
           avatar_url?: string | null;
           email: string;
+          full_name?: string | null;
+          updated_at?: string;
+          username?: string | null;
         };
         Update: {
           id?: string;
-          updated_at?: string;
-          username?: string | null;
-          full_name?: string | null;
           avatar_url?: string | null;
           email: string;
+          full_name?: string | null;
+          updated_at?: string;
+          username?: string | null;
         };
         Relationships: [];
       };
@@ -147,7 +148,23 @@ export interface Database {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      create_attendees_transaction: {
+        Args: {
+          attendees_data: Json;
+        };
+        Returns: {
+          id: string;
+          created_at: string;
+          full_name: string | null;
+          college_name: string | null;
+          department: string | null;
+          email: string | null;
+          phone_no: string | null;
+          attendee_id: string | null;
+          payment_id: string | null;
+          event_id: string | null;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
@@ -159,3 +176,8 @@ export interface Database {
 }
 
 export type Tables<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Row"];
+export type Enums<T extends keyof Database["public"]["Enums"]> = Database["public"]["Enums"][T];
+
+export type Attendee = Tables<"attendees">;
+export type Event = Tables<"events">;
+export type Profile = Tables<"profiles">;

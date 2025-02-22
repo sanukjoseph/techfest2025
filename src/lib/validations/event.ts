@@ -9,9 +9,9 @@ export const eventSchema = z.object({
   event_type: z.enum(["single", "group"]).default("single"),
   category: z.enum(["technical", "non-technical"]).default("technical"),
   format: z.enum(["workshop", "competition"]).default("competition"),
-  num_winners: z.number().min(0).default(0),
   min_group_size: z.number().min(1).default(1),
   max_group_size: z.number().min(1).default(5),
+  active: z.boolean().default(true),
 });
 
 export const fileSchema = z.object({

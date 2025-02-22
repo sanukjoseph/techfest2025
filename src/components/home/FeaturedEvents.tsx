@@ -1,7 +1,7 @@
 import React from "react";
-import { EventCarousel } from "@/components/layout/EventCarousel";
 import { getAllEvents } from "@/actions/events";
 import { squidgame } from "@/app/styles/fonts";
+import { EventCarousel } from "./EventCarousel";
 
 const FeaturedEvents = async () => {
   const eventsResult = await getAllEvents();

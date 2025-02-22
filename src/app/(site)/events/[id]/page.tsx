@@ -1,4 +1,3 @@
-import { squidgame } from "@/app/styles/fonts";
 import { getEvent } from "@/actions/events";
 import AttendeeForm from "@/components/events/attendee-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +8,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { squidgame } from "@/app/styles/fonts";
 
 const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const id = (await params).id;
@@ -80,11 +80,11 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                <p className="text-lg text-gray-300 leading-relaxed">{data.description}</p>
+                <p className="text-lg text-gray-300 leading-relaxed whitespace-pre-wrap">{data.description}</p>
                 <Separator className="bg-gray-800" />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <h2 className="font-semibold text-gray-200 text-md">Price</h2>
+                    <h2 className="font-semibold text-gray-200 text-md">Registration Fee</h2>
                     <p className="text-gray-400 text-lg">{data.price ? `₹${data.price}` : "Free"}</p>
                   </div>
                   <div className="space-y-2">
@@ -93,7 +93,16 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
                   </div>
                   <div className="space-y-2">
                     <h2 className="font-semibold text-gray-200 text-md">Event Type</h2>
-                    <p className="text-gray-400 text-lg capitalize">{data.event_type}</p>
+                    <p className="text-gray-400 text-lg capitalize">
+                      {data.event_type}
+                      <span className="ml-2">
+                        {data.event_type === "group" && (
+                          <>
+                            {data.min_group_size} - {data.max_group_size}
+                          </>
+                        )}
+                      </span>
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <h2 className="font-semibold text-gray-200 text-md">Category</h2>
@@ -103,9 +112,15 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
               </div>
             </CardContent>
           </Card>
-
-          {/* Attendee Form */}
-          <AttendeeForm eventId={id} isGroupEvent={data.event_type === "group"} price={data.price || 0} />
+          <AttendeeForm
+            eventId={data.id}
+            name={data.name ?? ""}
+            price={data.price ?? 0}
+            description={data.description ?? ""}
+            eventType={data.event_type ?? ""}
+            maxGroupSize={data.max_group_size ?? 0}
+            minGroupSize={data.min_group_size ?? 0}
+          />
         </div>
       </div>
     </section>

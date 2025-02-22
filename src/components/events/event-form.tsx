@@ -40,14 +40,12 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
       event_type: "single",
       category: "technical",
       format: "competition",
-      num_winners: 0,
       min_group_size: 1,
       max_group_size: 5,
     },
   });
 
   const eventType = useWatch({ control: form.control, name: "event_type" });
-  const format = useWatch({ control: form.control, name: "format" });
 
   useEffect(() => {
     setEvents(initialEvents ?? []);
@@ -64,7 +62,6 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
         event_type: (selectedEvent.event_type as "single" | "group") || "single",
         category: (selectedEvent.category as "technical" | "non-technical") || "technical",
         format: (selectedEvent.format as "workshop" | "competition") || "competition",
-        num_winners: selectedEvent.num_winners || 0,
         min_group_size: selectedEvent.min_group_size || 1,
         max_group_size: selectedEvent.max_group_size || 5,
       });
@@ -78,7 +75,6 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
         event_type: "single",
         category: "technical",
         format: "competition",
-        num_winners: 0,
         min_group_size: 1,
         max_group_size: 5,
       });
@@ -325,22 +321,6 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
                     )}
                   />
                 </div>
-
-                {format === "competition" && (
-                  <FormField
-                    control={form.control}
-                    name="num_winners"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Number of Winners</FormLabel>
-                        <FormControl>
-                          <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
 
                 {eventType === "group" && (
                   <div className="grid grid-cols-2 gap-4">
