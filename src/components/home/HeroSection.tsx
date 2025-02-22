@@ -4,13 +4,14 @@ import Image from "next/image";
 import React from "react";
 import { Button } from "../ui/button";
 import { squidgame } from "@/app/styles/fonts";
+import Link from "next/link";
 // import { Button } from "./ui/button";
 
 const HeroSection = () => {
   return (
     <div
       id="home"
-      className="relative h-screen flex items-center justify-center bg-cover bg-center -mt-20"
+      className="relative h-screen flex items-center justify-center bg-cover bg-center"
       style={{ backgroundImage: "url('/hero-upscale.jpg')" }}
     >
       <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
@@ -37,10 +38,12 @@ const HeroSection = () => {
           </div>
           <div className="flex justify-center md:justify-end items-end mb-4 md:mb-0">
             <Button
-              variant={"outline"}
-              className={`${squidgame.className} border border-pink-500 rounded-lg text-md hover:bg-pink-600 transition text-white shadow-xl`}
+              // variant={"outline"}
+              className={`${squidgame.className} border border-pink-500 bg-pink-600 rounded-lg text-lg hover:bg-pink-700 transition text-white shadow-xl`}
             >
-              Join the Game
+              <Link href="/events">
+                Join the Game
+              </Link>
             </Button>
             {/* <h1 className="md:text-center text-xl md:text-2xl font-bold text-white bg-white bg-opacity-5 font-gameOfSquid rounded-lg p-4">
               <span className="text-pink-500">Registration</span> Starts at:
