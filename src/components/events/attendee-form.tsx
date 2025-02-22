@@ -159,7 +159,7 @@ const AttendeeForm = ({ eventId, isGroupEvent, price }: AttendeeFormProps) => {
   }, [price, form]);
 
   return (
-    <Card className="max-w-3xl mx-auto bg-gray-900 border-gray-800 shadow-lg">
+    <Card className="max-w-4xl mx-auto bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-xl p-3 shadow-xl">
       <CardHeader>
         <CardTitle className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
           Event Registration
