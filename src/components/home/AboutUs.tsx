@@ -27,8 +27,8 @@ export default function AboutUs() {
             push the boundaries of technology.
           </p>
           <p className="text-base md:text-lg leading-relaxed text-left">
-            Experience a two-day tech extravaganza featuring thrilling competitions, insightful workshops, and engaging activities. Join us
-            as we celebrate technology, talent, and teamwork at <strong className="text-pink-400">Techsphere 2025</strong>. Be part of the
+            Experience a day tech extravaganza featuring thrilling competitions, insightful workshops, and engaging activities. Join us as
+            we celebrate technology, talent, and teamwork at <strong className="text-pink-400">Techsphere 2025</strong>. Be part of the
             future of tech!
           </p>
         </div>

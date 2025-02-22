@@ -41,7 +41,7 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
 
         {/* Event Header */}
         <div className="flex flex-col items-center gap-4 text-center mb-12">
-          <Badge variant="outline" className="text-sm bg-gray-900/50 backdrop-blur-sm border-gray-800 px-4 py-1">
+          <Badge variant="outline" className="text-sm bg-gray-900/50 backdrop-blur-sm border-gray-800 px-4 py-1 uppercase">
             {data.category}
           </Badge>
           <h1
