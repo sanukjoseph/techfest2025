@@ -109,6 +109,12 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
                     <p className="text-gray-400 text-lg capitalize">{data.category}</p>
                   </div>
                 </div>
+                <div className="space-y-">
+                  <h2 className="text-sm text-gray-600">
+                    <span className="text-red-800">Disclamer:</span> The details provided will be directly reflected in the certificate.
+                    Please ensure accuracy, as the organization is not responsible for any errors in the submitted information. for errors.
+                  </h2>
+                </div>
               </div>
             </CardContent>
           </Card>
