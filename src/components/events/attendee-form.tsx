@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useTransition, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { attendeeSchema, type AttendeeFormData } from "@/lib/validations/attendee";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { registerAttendees } from "@/actions/register";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -128,20 +128,20 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
   };
 
   return (
-    <Card className="max-w-4xl mx-auto bg-black text-gray-300 shadow-lg border border-gray-800">
-      <CardHeader className="border-b border-gray-800 pb-4">
+    <div className="max-w-4xl p-0 text-gray-300 shadow-lg ">
+      <CardHeader className=" pb-4">
         <CardTitle className="text-3xl font-bold text-center text-white">Event Registration</CardTitle>
         <CardDescription className="text-gray-400 text-center">Fill out the form below to register for the event.</CardDescription>
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="p-0">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
             <Accordion type="single" collapsible defaultValue="personal-details" className="space-y-4">
-              <AccordionItem value="personal-details" className="border border-gray-800 rounded-xl overflow-hidden">
-                <AccordionTrigger className="bg-gray-900 px-4 py-2 text-lg font-semibold hover:bg-gray-800 transition-colors">
+              <AccordionItem value="personal-details" className=" rounded-xl overflow-hidden">
+                <AccordionTrigger className=" px-4 py-2 text-lg font-semibold hover:bg-gray-800 transition-colors">
                   Your Details
                 </AccordionTrigger>
-                <AccordionContent className="space-y-4 p-4 bg-black">
+                <AccordionContent className="space-y-4 p-4 ">
                   <FormField
                     control={form.control}
                     name="full_name"
@@ -234,10 +234,10 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
 
               {eventType === "group" && (
                 <AccordionItem value="group-members" className="border border-gray-800 rounded-xl overflow-hidden">
-                  <AccordionTrigger className="bg-gray-900 px-4 py-2 text-lg font-semibold hover:bg-gray-800 transition-colors">
+                  <AccordionTrigger className=" px-4 py-2 text-lg font-semibold hover:bg-gray-800 transition-colors">
                     Group Members Details
                   </AccordionTrigger>
-                  <AccordionContent className="space-y-5 p-4 bg-black">
+                  <AccordionContent className="space-y-5 p-4">
                     {fields.map((field, index) => (
                       <div key={field.id} className="space-y-4 mb-4 border border-gray-800 p-4 rounded-md bg-gray-900">
                         <h4 className="text-md font-semibold text-gray-300">Member {index + 1}</h4>
@@ -368,7 +368,7 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
             <Button
               type="submit"
               disabled={isPending || isSubmitting}
-              className="w-full mt-6 bg-gray-800 hover:bg-gray-700 text-white text-lg font-semibold py-3 rounded-md transition-colors"
+              className="w-full mt-6 bg-pink-800 hover:bg-gray-700 text-white text-lg font-semibold py-3 rounded-md transition-colors"
             >
               {isSubmitting ? "Registering..." : price > 0 ? "Register and Pay" : "Register"}
             </Button>
@@ -386,7 +386,7 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
           </form>
         </Form>
       </CardContent>
-    </Card>
+    </div>
   );
 };
 
