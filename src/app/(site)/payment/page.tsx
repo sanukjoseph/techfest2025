@@ -86,6 +86,12 @@ function Payment() {
           setPaymentStatus("failed");
         },
       },
+      method: {
+        netbanking: false,
+        card: true,
+        upi: true,
+        wallet: false,
+      },
     };
 
     rzp = new (window as any).Razorpay(options);
