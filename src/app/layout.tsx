@@ -18,6 +18,27 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SMASH Tech Fest",
   description: "Think, learn, code, and win exciting prizes at SMASH Tech Fest.",
+  openGraph: {
+    title: "SMASH Tech Fest",
+    description: "Think, learn, code, and win exciting prizes at SMASH Tech Fest.",
+    url: "https://www.smash.net.in/", // Replace with your deployed URL
+    // images: [
+    //   {
+    //     url: "/hero.svg", // Replace with your og image
+    //     width: 1200,
+    //     height: 630,
+    //     alt: "SMASH Tech Fest Hero Image",
+    //   },
+    // ],
+    siteName: "SMASH Tech Fest",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SMASH Tech Fest",
+    description: "Think, learn, code, and win exciting prizes at SMASH Tech Fest.",
+    // images: ["/hero.svg"], // Replace with your twitter image
+  },
 };
 
 export default function RootLayout({

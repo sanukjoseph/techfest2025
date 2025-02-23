@@ -18,31 +18,29 @@ export async function registerAttendees(
 ) {
   try {
     const supabase = await createServerSupabaseClient();
-    const allAttendees = attendeesData.flatMap((attendee) => {
-      const mainAttendee = {
-        full_name: attendee.full_name,
-        college_name: attendee.college_name,
-        department: attendee.department,
-        email: attendee.email,
-        phone_no: attendee.phone_no,
+    const mainAttendee = attendeesData[0];
+    const groupMembers = mainAttendee.group_members || [];
+
+    const allAttendees = [
+      {
+        full_name: mainAttendee.full_name,
+        college_name: mainAttendee.college_name,
+        department: mainAttendee.department,
+        email: mainAttendee.email,
+        phone_no: mainAttendee.phone_no,
         payment_id: null,
         event_id: eventId,
-      };
-
-      const groupMembers = attendee.group_members
-        ? attendee.group_members.map((member) => ({
-            full_name: member.full_name,
-            college_name: member.college_name,
-            department: member.department,
-            email: member.email,
-            phone_no: member.phone_no,
-            payment_id: null,
-            event_id: eventId,
-          }))
-        : [];
-
-      return [mainAttendee, ...groupMembers];
-    });
+      },
+      ...groupMembers.map((member) => ({
+        full_name: member.full_name,
+        college_name: member.college_name,
+        department: member.department,
+        email: member.email,
+        phone_no: member.phone_no,
+        payment_id: null,
+        event_id: eventId,
+      })),
+    ];
 
     for (const attendee of allAttendees) {
       const { data: existingAttendee } = await supabase
@@ -75,6 +73,7 @@ export async function registerAttendees(
       if (insertError) {
         return { error: insertError.message };
       }
+
       return {
         orderId: order.id,
         eventName,
