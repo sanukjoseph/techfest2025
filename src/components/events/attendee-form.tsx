@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useTransition, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { attendeeSchema, AttendeeFormData } from "@/lib/validations/attendee";
+import { attendeeSchema, type AttendeeFormData } from "@/lib/validations/attendee";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { registerAttendees } from "@/actions/register";
@@ -50,18 +50,16 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
   });
 
   useEffect(() => {
-    if (eventType === "group" && fields.length < minGroupSize) {
-      for (let i = fields.length; i < minGroupSize; i++) {
-        append({
-          full_name: "",
-          college_name: "",
-          department: "",
-          email: "",
-          phone_no: "",
-        });
-      }
+    if (eventType === "group" && fields.length === 0) {
+      append({
+        full_name: "",
+        college_name: "",
+        department: "",
+        email: "",
+        phone_no: "",
+      });
     }
-  }, [eventType, maxGroupSize, append, fields.length, minGroupSize]);
+  }, [eventType, append, fields.length]);
 
   const handleFormSubmit = async (data: AttendeeFormData) => {
     if (isSubmitting) {
@@ -69,17 +67,32 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
     }
 
     setIsSubmitting(true);
-
     setRegistrationError(null);
     setPaymentError(null);
+    if (!data.full_name || !data.email || !data.phone_no) {
+      setRegistrationError("Please fill out all required fields for the main attendee.");
+      setIsSubmitting(false);
+      return;
+    }
+    if (eventType === "group") {
+      const validGroupMembers = (data.group_members ?? []).filter((member) => member.full_name && member.email && member.phone_no);
+      if (validGroupMembers.length + 1 < minGroupSize) {
+        setRegistrationError(`Please fill out details for at least ${minGroupSize - 1} group members.`);
+        setIsSubmitting(false);
+        return;
+      }
+      if (validGroupMembers.length + 1 > maxGroupSize) {
+        setRegistrationError(`You can only register a maximum of ${maxGroupSize} attendees (including yourself).`);
+        setIsSubmitting(false);
+        return;
+      }
+    }
 
     startTransition(async () => {
       try {
         let attendeesData;
         if (eventType === "group") {
-          // Filter out group members who have filled name field
-          const validGroupMembers = data.group_members ? data.group_members.filter((member) => member.full_name !== "") : [];
-
+          const validGroupMembers = (data.group_members ?? []).filter((member) => member.full_name && member.email && member.phone_no);
           attendeesData = [
             { ...data, payment_id: null, event_id: eventId },
             ...validGroupMembers.map((member) => ({
@@ -115,28 +128,34 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
   };
 
   return (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="text-2xl">Event Registration</CardTitle>
-        <CardDescription>Fill out the form below to register for the event.</CardDescription>
+    <Card className="max-w-4xl mx-auto bg-black text-gray-300 shadow-lg border border-gray-800">
+      <CardHeader className="border-b border-gray-800 pb-4">
+        <CardTitle className="text-3xl font-bold text-center text-white">Event Registration</CardTitle>
+        <CardDescription className="text-gray-400 text-center">Fill out the form below to register for the event.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
-            <Accordion type="single" collapsible>
-              <AccordionItem value="personal-details">
-                <AccordionTrigger>Your Details</AccordionTrigger>
-                <AccordionContent className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
+            <Accordion type="single" collapsible defaultValue="personal-details" className="space-y-4">
+              <AccordionItem value="personal-details" className="border border-gray-800 rounded-xl overflow-hidden">
+                <AccordionTrigger className="bg-gray-900 px-4 py-2 text-lg font-semibold hover:bg-gray-800 transition-colors">
+                  Your Details
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 p-4 bg-black">
                   <FormField
                     control={form.control}
                     name="full_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel className="text-gray-300">Full Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your full name" {...field} />
+                          <Input
+                            placeholder="Enter your full name"
+                            {...field}
+                            className="bg-gray-900 border-gray-700 text-white placeholder-gray-500"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
@@ -145,11 +164,15 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                     name="college_name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>College Name</FormLabel>
+                        <FormLabel className="text-gray-300">College Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your college name" {...field} />
+                          <Input
+                            placeholder="Enter your college name"
+                            {...field}
+                            className="bg-gray-900 border-gray-700 text-white placeholder-gray-500"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
@@ -158,11 +181,15 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                     name="department"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Department</FormLabel>
+                        <FormLabel className="text-gray-300">Department</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your department" {...field} />
+                          <Input
+                            placeholder="Enter your department"
+                            {...field}
+                            className="bg-gray-900 border-gray-700 text-white placeholder-gray-500"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
@@ -171,11 +198,16 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel className="text-gray-300">Email</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your email" type="email" {...field} />
+                          <Input
+                            placeholder="Enter your email"
+                            type="email"
+                            {...field}
+                            className="bg-gray-900 border-gray-700 text-white placeholder-gray-500"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
@@ -184,11 +216,16 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                     name="phone_no"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel className="text-gray-300">Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your phone number" type="tel" {...field} />
+                          <Input
+                            placeholder="Enter your phone number"
+                            type="tel"
+                            {...field}
+                            className="bg-gray-900 border-gray-700 text-white placeholder-gray-500"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-red-400" />
                       </FormItem>
                     )}
                   />
@@ -196,22 +233,28 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
               </AccordionItem>
 
               {eventType === "group" && (
-                <AccordionItem value="group-members">
-                  <AccordionTrigger>Group Members Details</AccordionTrigger>
-                  <AccordionContent>
+                <AccordionItem value="group-members" className="border border-gray-800 rounded-xl overflow-hidden">
+                  <AccordionTrigger className="bg-gray-900 px-4 py-2 text-lg font-semibold hover:bg-gray-800 transition-colors">
+                    Group Members Details
+                  </AccordionTrigger>
+                  <AccordionContent className="space-y-5 p-4 bg-black">
                     {fields.map((field, index) => (
-                      <div key={field.id} className="space-y-4 mb-4 border p-4 rounded-md">
-                        <h4 className="text-md font-semibold">Member {index + 1}</h4>
+                      <div key={field.id} className="space-y-4 mb-4 border border-gray-800 p-4 rounded-md bg-gray-900">
+                        <h4 className="text-md font-semibold text-gray-300">Member {index + 1}</h4>
                         <FormField
                           control={form.control}
                           name={`group_members.${index}.full_name`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Full Name</FormLabel>
+                              <FormLabel className="text-gray-300">Full Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter group member's full name" {...field} />
+                                <Input
+                                  placeholder="Enter group member's full name"
+                                  {...field}
+                                  className="bg-black border-gray-700 text-white placeholder-gray-500"
+                                />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
@@ -220,11 +263,15 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                           name={`group_members.${index}.college_name`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>College Name</FormLabel>
+                              <FormLabel className="text-gray-300">College Name</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter group member's college name" {...field} />
+                                <Input
+                                  placeholder="Enter group member's college name"
+                                  {...field}
+                                  className="bg-black border-gray-700 text-white placeholder-gray-500"
+                                />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
@@ -233,11 +280,15 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                           name={`group_members.${index}.department`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Department</FormLabel>
+                              <FormLabel className="text-gray-300">Department</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter group member's department" {...field} />
+                                <Input
+                                  placeholder="Enter group member's department"
+                                  {...field}
+                                  className="bg-black border-gray-700 text-white placeholder-gray-500"
+                                />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
@@ -246,11 +297,16 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                           name={`group_members.${index}.email`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel className="text-gray-300">Email</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter group member's email" type="email" {...field} />
+                                <Input
+                                  placeholder="Enter group member's email"
+                                  type="email"
+                                  {...field}
+                                  className="bg-black border-gray-700 text-white placeholder-gray-500"
+                                />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
@@ -259,22 +315,33 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                           name={`group_members.${index}.phone_no`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Phone Number</FormLabel>
+                              <FormLabel className="text-gray-300">Phone Number</FormLabel>
                               <FormControl>
-                                <Input placeholder="Enter group member's phone number" type="tel" {...field} />
+                                <Input
+                                  placeholder="Enter group member's phone number"
+                                  type="tel"
+                                  {...field}
+                                  className="bg-black border-gray-700 text-white placeholder-gray-500"
+                                />
                               </FormControl>
-                              <FormMessage />
+                              <FormMessage className="text-red-400" />
                             </FormItem>
                           )}
                         />
-                        {fields.length > minGroupSize && (
-                          <Button variant="destructive" size="sm" type="button" onClick={() => remove(index)}>
+                        {fields.length > 1 && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            type="button"
+                            onClick={() => remove(index)}
+                            className="bg-gray-800 hover:bg-gray-700 text-white"
+                          >
                             Remove Member
                           </Button>
                         )}
                       </div>
                     ))}
-                    {fields.length < maxGroupSize && (
+                    {fields.length < maxGroupSize - 1 && (
                       <Button
                         variant="secondary"
                         size="sm"
@@ -288,6 +355,7 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
                             phone_no: "",
                           })
                         }
+                        className="bg-gray-800 hover:bg-gray-700 text-white"
                       >
                         Add Member
                       </Button>
@@ -297,17 +365,21 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
               )}
             </Accordion>
 
-            <Button type="submit" disabled={isPending || isSubmitting} className="w-full mt-4">
+            <Button
+              type="submit"
+              disabled={isPending || isSubmitting}
+              className="w-full mt-6 bg-gray-800 hover:bg-gray-700 text-white text-lg font-semibold py-3 rounded-md transition-colors"
+            >
               {isSubmitting ? "Registering..." : price > 0 ? "Register and Pay" : "Register"}
             </Button>
 
             {paymentError && (
-              <Alert variant="destructive" className="mt-4">
+              <Alert variant="destructive" className="mt-4 bg-gray-900 text-red-400 border border-red-800">
                 <AlertDescription>{paymentError}</AlertDescription>
               </Alert>
             )}
             {registrationError && (
-              <Alert variant="destructive" className="mt-4">
+              <Alert variant="destructive" className="mt-4 bg-gray-900 text-red-400 border border-red-800">
                 <AlertDescription>{registrationError}</AlertDescription>
               </Alert>
             )}
