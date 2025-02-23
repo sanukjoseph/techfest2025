@@ -1,9 +1,11 @@
+/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
+import { updatePaymentStatus } from "@/actions/register";
 
 function Payment() {
   const router = useRouter();
@@ -16,6 +18,7 @@ function Payment() {
   const phone = searchParams.get("phone");
 
   const [isRazorpayLoaded, setIsRazorpayLoaded] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState("pending");
 
   useEffect(() => {
     if (!orderId || !eventName || !price || !name || !email || !phone) {
@@ -30,7 +33,7 @@ function Payment() {
     };
     script.onerror = () => {
       console.error("Failed to load Razorpay script.");
-      window.location.href = "/payment/failed";
+      setPaymentStatus("failed");
     };
     document.body.appendChild(script);
 
@@ -42,6 +45,8 @@ function Payment() {
   useEffect(() => {
     if (!isRazorpayLoaded) return;
 
+    let rzp: any;
+
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
       amount: price,
@@ -50,7 +55,16 @@ function Payment() {
       description: "Event Registration",
       order_id: orderId,
       handler: async () => {
-        window.location.href = "/payment/success";
+        if (!orderId) {
+          setPaymentStatus("failed");
+          return;
+        }
+        const result = await updatePaymentStatus({ paymentId: orderId, status: "success" });
+        if (!result || result.data?.error) {
+          setPaymentStatus("failed");
+          return;
+        }
+        setPaymentStatus("success");
       },
       prefill: {
         name: name,
@@ -60,19 +74,50 @@ function Payment() {
       theme: {
         color: "#3399cc",
       },
+      modal: {
+        ondismiss: async () => {
+          if (orderId) {
+            const result = await updatePaymentStatus({ paymentId: orderId, status: "failed" });
+            if (!result || result.data?.error) {
+              setPaymentStatus("failed");
+              return;
+            }
+          }
+          setPaymentStatus("failed");
+        },
+      },
     };
-    const rzp = new (window as any).Razorpay(options);
-    rzp.on("payment.failed", () => {
-      window.location.href = "/payment/failed";
+
+    rzp = new (window as any).Razorpay(options);
+    rzp.on("payment.failed", async () => {
+      if (!orderId) {
+        setPaymentStatus("failed");
+        return;
+      }
+      const result = await updatePaymentStatus({ paymentId: orderId, status: "failed" });
+      if (!result || result.data?.error) {
+        setPaymentStatus("failed");
+        return;
+      }
+      setPaymentStatus("failed");
     });
-    rzp.on("close", () => {
-      window.location.href = "/payment/failed";
-    });
+
     rzp.open();
+
     return () => {
-      rzp.close();
+      if (rzp) {
+        rzp.close();
+      }
     };
   }, [isRazorpayLoaded, orderId, eventName, price, name, email, phone]);
+
+  useEffect(() => {
+    if (paymentStatus === "success") {
+      window.location.href = "/payment/success";
+    } else if (paymentStatus === "failed") {
+      window.location.href = "/payment/failed";
+    }
+  }, [paymentStatus]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">

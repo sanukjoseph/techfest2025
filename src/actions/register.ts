@@ -3,6 +3,8 @@
 import Razorpay from "razorpay";
 import { AttendeeFormData } from "@/lib/validations/attendee";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { actionClient } from "@/lib/safe-action";
+import { z } from "zod";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -97,3 +99,73 @@ export async function registerAttendees(
     return { error: "An error occurred during registration." };
   }
 }
+
+export const updatePaymentStatus = actionClient
+  .schema(
+    z.object({
+      paymentId: z.string(),
+      status: z.enum(["success", "failed", "pending"]),
+    }),
+  )
+  .action(async ({ parsedInput }) => {
+    const { paymentId, status } = parsedInput;
+    const supabase = await createServerSupabaseClient();
+
+    try {
+      // Start a transaction
+      const { error: transactionError } = await supabase.rpc("create_attendees_transaction");
+      if (transactionError) throw transactionError;
+
+      // Update attendees' payment status
+      const { data: updatedAttendees, error: attendeesError } = await supabase
+        .from("attendees")
+        .update({ payment_status: status })
+        .eq("payment_id", paymentId)
+        .select("event_id");
+
+      if (attendeesError) throw attendeesError;
+
+      if (status === "success" && updatedAttendees && updatedAttendees.length > 0) {
+        const eventId = updatedAttendees[0].event_id;
+        const attendeesCount = updatedAttendees.length;
+
+        // Fetch current event details
+        const { data: eventData, error: eventError } = await supabase
+          .from("events")
+          .select("registration_count, event_limit, active")
+          .eq("id", eventId!)
+          .single();
+
+        if (eventError) throw eventError;
+
+        const newRegistrationCount = (eventData.registration_count || 0) + attendeesCount;
+        const shouldDisable = eventData.event_limit !== null && newRegistrationCount >= eventData.event_limit;
+
+        if (!eventId) {
+          throw new Error("Event ID is required");
+        }
+
+        // Update event registration count and active status
+        const { error: updateError } = await supabase
+          .from("events")
+          .update({
+            registration_count: newRegistrationCount,
+            active: shouldDisable ? false : eventData.active,
+          })
+          .eq("id", eventId);
+
+        if (updateError) throw updateError;
+      }
+
+      // Commit the transaction
+      const { error: commitError } = await supabase.rpc("commit_transaction");
+      if (commitError) throw commitError;
+
+      return { success: true };
+    } catch (error) {
+      console.error("Action error:", error);
+      // Rollback the transaction in case of any error
+      await supabase.rpc("rollback_transaction");
+      return { success: false, error: "Failed to update payment status and event details." };
+    }
+  });

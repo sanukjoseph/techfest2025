@@ -12,10 +12,10 @@ export interface Database {
           department: string | null;
           email: string | null;
           phone_no: string | null;
-          school_id: string | null;
           attendee_id: string | null;
           payment_id: string | null;
           event_id: string | null;
+          payment_status: string | null;
         };
         Insert: {
           id?: string;
@@ -25,10 +25,10 @@ export interface Database {
           department?: string | null;
           email?: string | null;
           phone_no?: string | null;
-          school_id?: string | null;
           attendee_id?: string | null;
           payment_id?: string | null;
           event_id?: string | null;
+          payment_status?: string | null;
         };
         Update: {
           id?: string;
@@ -38,10 +38,10 @@ export interface Database {
           department?: string | null;
           email?: string | null;
           phone_no?: string | null;
-          school_id?: string | null;
           attendee_id?: string | null;
           payment_id?: string | null;
           event_id?: string | null;
+          payment_status?: string | null;
         };
         Relationships: [
           {
@@ -66,7 +66,6 @@ export interface Database {
           max_group_size: number | null;
           min_group_size: number | null;
           name: string | null;
-          num_winners: number | null;
           price: number | null;
           registration_count: number | null;
           user_id: string;
@@ -84,7 +83,6 @@ export interface Database {
           max_group_size?: number | null;
           min_group_size?: number | null;
           name?: string | null;
-          num_winners?: number | null;
           price?: number | null;
           registration_count?: number | null;
           user_id: string;
@@ -102,7 +100,6 @@ export interface Database {
           max_group_size?: number | null;
           min_group_size?: number | null;
           name?: string | null;
-          num_winners?: number | null;
           price?: number | null;
           registration_count?: number | null;
           user_id?: string;
@@ -149,21 +146,16 @@ export interface Database {
     };
     Functions: {
       create_attendees_transaction: {
-        Args: {
-          attendees_data: Json;
-        };
-        Returns: {
-          id: string;
-          created_at: string;
-          full_name: string | null;
-          college_name: string | null;
-          department: string | null;
-          email: string | null;
-          phone_no: string | null;
-          attendee_id: string | null;
-          payment_id: string | null;
-          event_id: string | null;
-        }[];
+        Args: object;
+        Returns: void;
+      };
+      commit_transaction: {
+        Args: object;
+        Returns: void;
+      };
+      rollback_transaction: {
+        Args: object;
+        Returns: void;
       };
     };
     Enums: {

@@ -88,11 +88,11 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
                     <p className="text-gray-400 text-lg">{data.price ? `₹${data.price}` : "Free"}</p>
                   </div>
                   <div className="space-y-2">
-                    <h2 className="font-semibold text-gray-200 text-md">Event Limit</h2>
+                    <h2 className="font-semibold text-gray-200 text-md">Max Participants</h2>
                     <p className="text-gray-400 text-lg">{data.event_limit || "Unlimited"}</p>
                   </div>
                   <div className="space-y-2">
-                    <h2 className="font-semibold text-gray-200 text-md">Event Type</h2>
+                    <h2 className="font-semibold text-gray-200 text-md">Team Size</h2>
                     <p className="text-gray-400 text-lg capitalize">
                       {data.event_type}
                       <span className="ml-2">
