@@ -23,14 +23,7 @@ const CountDownSection = () => {
   const characterImage = "/doll.png";
 
   return (
-    <div
-      className={`${squidgame.className} relative h-screen flex items-center justify-center bg-cover bg-center`}
-      // style={{ backgroundImage: "url('/mask.')" }} // Background image
-    >
-      <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px]"></div>
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-
+    <div className={`${squidgame.className} relative h-screen flex items-center justify-center bg-cover bg-center`}>
       {/* Content Container */}
       <div className="relative flex flex-col items-center text-center text-white z-10 gap-8 md:gap-12">
         {/* Top Badge */}
@@ -71,7 +64,6 @@ const CountDownSection = () => {
           <Link href={"/events"}>{buttonText}</Link>
         </Button>
       </div>
-
       {/* Character Image */}
       <div className="absolute bottom-0 right-20 hidden md:block">
         <Image src={characterImage} alt="Character" width={1000} height={1000} className="object-contain w-[350px] h-[100%]" />

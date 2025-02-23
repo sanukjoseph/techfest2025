@@ -21,7 +21,7 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
   const { data } = event;
 
   return (
-    <section className="min-h-screen py-5 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden relative bg-gradient-to-t from-black to-black">
+    <section className="min-h-screen py-5 md:py-20 px-4 sm:px-6 lg:px-8 overflow-hidden relative ">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]" />
 

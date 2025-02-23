@@ -161,52 +161,77 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Manage Events</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Event List</CardTitle>
-            <CardDescription>Select an event to edit or create a new one</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[400px]">
-              {events.length === 0 ? (
-                <p className="text-muted-foreground">No events created yet.</p>
-              ) : (
-                <div className="space-y-3">
-                  {events.map((event) => (
-                    <Card key={event.id} onClick={() => setSelectedEvent(event)} className="cursor-pointer hover:bg-accent">
-                      <CardHeader>
-                        <CardTitle className="text-lg">{event.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
-          </CardContent>
-        </Card>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Event List</CardTitle>
+          <CardDescription>Select an event to edit or create a new one</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ScrollArea className="h-[400px]">
+            {events.length === 0 ? (
+              <p className="text-muted-foreground">No events created yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {events.map((event) => (
+                  <Card key={event.id} onClick={() => setSelectedEvent(event)} className="cursor-pointer hover:bg-accent">
+                    <CardHeader>
+                      <CardTitle className="text-lg">{event.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{selectedEvent ? "Update Event" : "Create Event"}</CardTitle>
-            <CardDescription>{selectedEvent ? "Update the event details" : "Create a new event for the tech fest"}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>{selectedEvent ? "Update Event" : "Create Event"}</CardTitle>
+          <CardDescription>{selectedEvent ? "Update the event details" : "Create a new event for the tech fest"}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Event Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Event Description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>Price</FormLabel>
                       <FormControl>
-                        <Input placeholder="Event Name" {...field} />
+                        <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -214,26 +239,97 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="description"
+                  name="event_limit"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>Limit</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Event Description" {...field} />
+                        <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="event_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Event Type</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select event type" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="single">Single</SelectItem>
+                          <SelectItem value="group">Group</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Category</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="technical">Technical</SelectItem>
+                          <SelectItem value="non-technical">Non-Technical</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="format"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Format</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select format" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="workshop">Workshop</SelectItem>
+                          <SelectItem value="competition">Competition</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {eventType === "group" && (
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="price"
+                    name="min_group_size"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Price</FormLabel>
+                        <FormLabel>Min Group Size</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                          <Input type="number" placeholder="1" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -241,161 +337,62 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
                   />
                   <FormField
                     control={form.control}
-                    name="event_limit"
+                    name="max_group_size"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Limit</FormLabel>
+                        <FormLabel>Max Group Size</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="0" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+                          <Input type="number" placeholder="5" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+              )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="event_type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Event Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select event type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="single">Single</SelectItem>
-                            <SelectItem value="group">Group</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
+              <FormField
+                control={form.control}
+                name="image_url"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image</FormLabel>
+                    <FormControl>
+                      <div
+                        {...getRootProps()}
+                        className={`border-2 border-dashed rounded-md p-4 text-center cursor-pointer ${
+                          isDragActive ? "border-primary" : "border-gray-300"
+                        }`}
+                      >
+                        <input {...getInputProps()} />
+                        {isDragActive ? <p>Drop the image here ...</p> : <p>Drag and drop an image here, or click to select one</p>}
+                        <p className="text-sm text-muted-foreground mt-2">Max file size: 5MB</p>
+                      </div>
+                    </FormControl>
+                    {field.value && (
+                      <div className="mt-2">
+                        <Image src={field.value || "/placeholder.svg"} alt="Event" width={200} height={200} className="rounded-md" />
+                      </div>
                     )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Category</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="technical">Technical</SelectItem>
-                            <SelectItem value="non-technical">Non-Technical</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="format"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Format</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select format" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="workshop">Workshop</SelectItem>
-                            <SelectItem value="competition">Competition</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {eventType === "group" && (
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="min_group_size"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Min Group Size</FormLabel>
-                          <FormControl>
-                            <Input type="number" placeholder="1" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="max_group_size"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Max Group Size</FormLabel>
-                          <FormControl>
-                            <Input type="number" placeholder="5" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                    <FormMessage />
+                  </FormItem>
                 )}
-
-                <FormField
-                  control={form.control}
-                  name="image_url"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Image</FormLabel>
-                      <FormControl>
-                        <div
-                          {...getRootProps()}
-                          className={`border-2 border-dashed rounded-md p-4 text-center cursor-pointer ${
-                            isDragActive ? "border-primary" : "border-gray-300"
-                          }`}
-                        >
-                          <input {...getInputProps()} />
-                          {isDragActive ? <p>Drop the image here ...</p> : <p>Drag and drop an image here, or click to select one</p>}
-                          <p className="text-sm text-muted-foreground mt-2">Max file size: 5MB</p>
-                        </div>
-                      </FormControl>
-                      {field.value && (
-                        <div className="mt-2">
-                          <Image src={field.value || "/placeholder.svg"} alt="Event" width={200} height={200} className="rounded-md" />
-                        </div>
-                      )}
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Separator />
-                <div className="flex justify-end space-x-2">
-                  {selectedEvent && (
-                    <Button variant="destructive" onClick={handleDelete} type="button" disabled={isPending}>
-                      Delete
-                    </Button>
-                  )}
-                  <Button type="submit" disabled={isPending}>
-                    {selectedEvent ? "Update Event" : "Create Event"}
+              />
+              <Separator />
+              <div className="flex justify-end space-x-2">
+                {selectedEvent && (
+                  <Button variant="destructive" onClick={handleDelete} type="button" disabled={isPending}>
+                    Delete
                   </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-      </div>
+                )}
+                <Button type="submit" disabled={isPending}>
+                  {selectedEvent ? "Update Event" : "Create Event"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 }

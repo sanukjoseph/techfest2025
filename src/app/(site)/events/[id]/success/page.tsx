@@ -34,7 +34,7 @@ export default function NormalSuccessPage() {
   }, [router]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black">
+    <div className="flex items-center justify-center min-h-screen">
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}

@@ -1,79 +1,66 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginFormData, loginSchema } from "@/lib/validations/auth";
-import { useAuthStore } from "@/store/use-auth-store";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { useTransition } from "react";
+import { useActionState } from "react";
+import { login } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { loginUser } from "@/actions/auth";
+import { Label } from "@/components/ui/label";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export function LoginForm() {
-  const { setUser } = useAuthStore();
-  const router = useRouter();
-  const [isPending, startTransition] = useTransition();
-
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const handleLogin = async (data: LoginFormData) => {
-    startTransition(async () => {
-      try {
-        const result = await loginUser(data);
-        if (result?.serverError && !result.data?.data) {
-          throw new Error(result.serverError);
-        }
-        setUser(result?.data?.data?.user ?? null);
-        toast.success("You have successfully logged in.");
-        router.push("/dashboard");
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Failed to login");
-      }
-    });
-  };
+export default function LoginPage() {
+  const [state, formAction, isPending] = useActionState(login, { error: "" });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="you@example.com" {...field} disabled={isPending} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input type="password" {...field} disabled={isPending} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit" className="w-full" disabled={isPending}>
-          {isPending ? "Signing in..." : "Sign in"}
-        </Button>
-      </form>
-    </Form>
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center text-red-600">Login</CardTitle>
+          <CardDescription className="text-center text-foreground/80">
+            Enter your credentials to proceed. Failure is not an option.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={formAction} className="space-y-4">
+            {state?.error && (
+              <Alert variant="destructive">
+                <AlertDescription>{state.error}</AlertDescription>
+              </Alert>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-foreground">
+                Email
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email"
+                required
+                autoComplete="off"
+                className="focus:ring-red-600 focus:border-red-600"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-foreground">
+                Password
+              </Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Enter your password"
+                required
+                autoComplete="off"
+                className="focus:ring-red-600 focus:border-red-600"
+              />
+            </div>
+            <Button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white" disabled={isPending}>
+              {isPending ? "Entering the Game..." : "Enter the Game"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

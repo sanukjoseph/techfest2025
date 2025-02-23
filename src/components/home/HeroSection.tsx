@@ -15,7 +15,7 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
 
       {/* Gradient shadow at the bottom */}
-      <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-black to-transparent z-50"></div>
+      <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-background to-transparent z-50"></div>
 
       {/* Content */}
       <div className="relative h-screen w-full flex items-center justify-center text-center text-white z-10">

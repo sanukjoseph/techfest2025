@@ -32,7 +32,7 @@ const support = [
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-t from-gray-900 to-black text-white py-12 ">
+    <footer className=" py-12 ">
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center justify-center space-y-8">
           <h2

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div className="bg-black relative overflow-hidden">
+    <div className=" relative overflow-hidden">
       <HeroSection />
       <FeaturedEvents />
       <CountDownSection />

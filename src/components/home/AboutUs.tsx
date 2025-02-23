@@ -8,7 +8,6 @@ export default function AboutUs() {
       className="py-20 relative w-full min-h-fit bg-cover bg-center flex flex-col items-center justify-center px-6 md:px-12 lg:px-24"
       // style={{ backgroundImage: "url('/about-bg.jpg')" }} // Add a background image
     >
-      <div className="absolute inset-0 bg-black/50"></div>
       <div className="relative z-10 text-white flex flex-col items-center w-full max-w-7xl">
         <div className="max-w-3xl text-gray-300 flex flex-col">
           <h2

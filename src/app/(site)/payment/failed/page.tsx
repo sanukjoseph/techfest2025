@@ -59,7 +59,6 @@ export default function PaymentFailedPage() {
           }}
         >
           <div className="w-full h-full bg-red-500 rounded-sm"></div>
-          <div className="absolute top-1/2 left-1/2 w-4 h-4 bg-black transform -translate-x-1/2 -translate-y-1/2"></div>
         </motion.div>
       </motion.div>
     </div>

@@ -8,9 +8,8 @@ const EventsPage = async () => {
   const events = await getAllEvents();
 
   return (
-    <section className="py-20 bg-gradient-to-b from-black to-black relative min-h-screen overflow-hidden">
+    <section className="py-20 relative min-h-screen overflow-hidden">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.05)_0%,_transparent_70%)]"></div>
       <div className="container mx-auto max-w-7xl flex flex-col gap-16 px-4 sm:px-6 lg:px-8 relative z-10">
         <Link
           href="/"
