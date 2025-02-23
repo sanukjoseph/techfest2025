@@ -112,15 +112,28 @@ const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> })
               </div>
             </CardContent>
           </Card>
-          <AttendeeForm
-            eventId={data.id}
-            name={data.name ?? ""}
-            price={data.price ?? 0}
-            description={data.description ?? ""}
-            eventType={data.event_type ?? ""}
-            maxGroupSize={data.max_group_size ?? 0}
-            minGroupSize={data.min_group_size ?? 0}
-          />
+          {data.active ? (
+            <AttendeeForm
+              eventId={data.id}
+              name={data.name ?? ""}
+              price={data.price ?? 0}
+              description={data.description ?? ""}
+              eventType={data.event_type ?? ""}
+              maxGroupSize={data.max_group_size ?? 0}
+              minGroupSize={data.min_group_size ?? 0}
+            />
+          ) : (
+            <Card className="bg-gray-900/50 backdrop-blur-sm border-gray-800 shadow-xl text-center">
+              <CardHeader>
+                <CardTitle className="text-2xl md:text-3xl bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent font-semibold">
+                  Registration Closed
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-lg text-gray-300 leading-relaxed">Registration for this event is now closed.</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </section>

@@ -32,6 +32,7 @@ export async function registerAttendees(
         phone_no: mainAttendee.phone_no,
         payment_id: null,
         event_id: eventId,
+        payment_status: price > 0 ? "pending" : "success",
       },
       ...groupMembers.map((member) => ({
         full_name: member.full_name,
@@ -41,18 +42,26 @@ export async function registerAttendees(
         phone_no: member.phone_no,
         payment_id: null,
         event_id: eventId,
+        payment_status: price > 0 ? "pending" : "success",
       })),
     ];
 
     for (const attendee of allAttendees) {
       const { data: existingAttendee } = await supabase
         .from("attendees")
-        .select("*")
+        .select("payment_id, payment_status")
         .or(`email.eq.${attendee.email},phone_no.eq.${attendee.phone_no}`)
         .single();
 
       if (existingAttendee) {
-        return { error: `Attendee with email ${attendee.email} or phone ${attendee.phone_no} is already registered for another event.` };
+        if (existingAttendee.payment_status === "success") {
+          return {
+            error: `Attendee with email ${attendee.email} or phone ${attendee.phone_no} has already purchased a valid event ticket.`,
+          };
+        }
+        if (existingAttendee.payment_id && existingAttendee.payment_status !== "success") {
+          await supabase.from("attendees").delete().match({ email: attendee.email, phone_no: attendee.phone_no });
+        }
       }
     }
 
