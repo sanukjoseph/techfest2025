@@ -39,7 +39,6 @@ const AttendeeForm = ({ eventId, price, maxGroupSize, eventType, description, na
       email: "",
       phone_no: "",
       payment_id: null,
-      event_id: eventId,
       group_members: [],
     },
   });

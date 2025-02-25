@@ -1,7 +1,7 @@
 "use server";
 
 import Razorpay from "razorpay";
-import { AttendeeFormData } from "@/lib/validations/attendee";
+import type { AttendeeFormData } from "@/lib/validations/attendee";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { actionClient } from "@/lib/safe-action";
 import { z } from "zod";
@@ -31,7 +31,6 @@ export async function registerAttendees(
         email: mainAttendee.email,
         phone_no: mainAttendee.phone_no,
         payment_id: null,
-        event_id: eventId,
         payment_status: price > 0 ? "pending" : "success",
       },
       ...groupMembers.map((member) => ({
@@ -41,28 +40,83 @@ export async function registerAttendees(
         email: member.email,
         phone_no: member.phone_no,
         payment_id: null,
-        event_id: eventId,
         payment_status: price > 0 ? "pending" : "success",
       })),
     ];
 
     for (const attendee of allAttendees) {
-      const { data: existingAttendee } = await supabase
+      const { data: existingAttendee, error: fetchError } = await supabase
         .from("attendees")
-        .select("payment_id, payment_status")
+        .select("id, paid_event_count, payment_id")
         .or(`email.eq.${attendee.email},phone_no.eq.${attendee.phone_no}`)
         .single();
 
+      if (fetchError && fetchError.code !== "PGRST116") {
+        throw fetchError;
+      }
+
+      let attendeeId;
+      let existingPaymentId = null;
+
       if (existingAttendee) {
-        if (existingAttendee.payment_status === "success") {
+        if (price > 0 && existingAttendee.paid_event_count > 0) {
           return {
-            error: `Attendee with email ${attendee.email} or phone ${attendee.phone_no} has already purchased a valid event ticket.`,
+            error: `Attendee with email ${attendee.email} or phone ${attendee.phone_no} has already registered for a paid event.`,
           };
         }
-        if (existingAttendee.payment_id && existingAttendee.payment_status !== "success") {
-          await supabase.from("attendees").delete().match({ email: attendee.email, phone_no: attendee.phone_no });
+
+        // Check if the attendee is already registered for this event
+        const { data: existingRegistration, error: registrationError } = await supabase
+          .from("attendee_events")
+          .select("event_id")
+          .eq("attendee_id", existingAttendee.id)
+          .eq("event_id", eventId)
+          .single();
+
+        if (registrationError && registrationError.code !== "PGRST116") {
+          throw registrationError;
         }
+
+        if (existingRegistration) {
+          return {
+            error: `Attendee with email ${attendee.email} or phone ${attendee.phone_no} is already registered for this event.`,
+          };
+        }
+
+        attendeeId = existingAttendee.id;
+        existingPaymentId = existingAttendee.payment_id;
+
+        // Update existing attendee (excluding paid_event_count update here, will handle after payment)
+        const { error: updateError } = await supabase
+          .from("attendees")
+          .update({
+            full_name: attendee.full_name,
+            college_name: attendee.college_name,
+            department: attendee.department,
+            payment_id: attendee.payment_id || existingPaymentId,
+            payment_status: attendee.payment_status,
+          })
+          .eq("id", existingAttendee.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Insert new attendee
+        const { data: newAttendee, error: insertError } = await supabase
+          .from("attendees")
+          .insert({
+            ...attendee,
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        attendeeId = newAttendee.id;
       }
+
+      // Insert into attendee_events for both new and existing attendees
+      const { error: relationError } = await supabase.from("attendee_events").insert({ attendee_id: attendeeId, event_id: eventId });
+
+      if (relationError) throw relationError;
     }
 
     if (price > 0) {
@@ -74,15 +128,16 @@ export async function registerAttendees(
       };
 
       const order = await razorpay.orders.create(options);
-      const { error: insertError } = await supabase.from("attendees").insert(
-        allAttendees.map((attendee) => ({
-          ...attendee,
-          payment_id: order.id,
-        })),
-      );
 
-      if (insertError) {
-        return { error: insertError.message };
+      // Update payment_id for all attendees (using email to link, assuming unique emails)
+      for (const attendee of allAttendees) {
+        const { error: updatePaymentIdError } = await supabase
+          .from("attendees")
+          .update({ payment_id: order.id })
+          .eq("email", attendee.email);
+        if (updatePaymentIdError) {
+          throw updatePaymentIdError;
+        }
       }
 
       return {
@@ -97,10 +152,12 @@ export async function registerAttendees(
         },
       };
     } else {
-      const { error: insertError } = await supabase.from("attendees").insert(allAttendees);
-      if (insertError) {
-        return { error: insertError.message };
+      // Update event registration count
+      const { error: updateError } = await supabase.rpc("update_all_events_registration_count");
+      if (updateError) {
+        throw updateError;
       }
+
       return { success: true };
     }
   } catch (err) {
@@ -130,40 +187,24 @@ export const updatePaymentStatus = actionClient
         .from("attendees")
         .update({ payment_status: status })
         .eq("payment_id", paymentId)
-        .select("event_id");
+        .select("id, paid_event_count"); // Select paid_event_count for update
 
       if (attendeesError) throw attendeesError;
 
       if (status === "success" && updatedAttendees && updatedAttendees.length > 0) {
-        const eventId = updatedAttendees[0].event_id;
-        const attendeesCount = updatedAttendees.length;
+        // Update paid_event_count for successful payments only if it wasn't already incremented
+        for (const attendee of updatedAttendees) {
+          if (attendee.paid_event_count === 0) {
+            // Check if paid_event_count is 0
+            const { error: updateCountError } = await supabase.from("attendees").update({ paid_event_count: 1 }).eq("id", attendee.id);
 
-        // Fetch current event details
-        const { data: eventData, error: eventError } = await supabase
-          .from("events")
-          .select("registration_count, event_limit, active")
-          .eq("id", eventId!)
-          .single();
-
-        if (eventError) throw eventError;
-
-        const newRegistrationCount = (eventData.registration_count || 0) + attendeesCount;
-        const shouldDisable = eventData.event_limit !== null && newRegistrationCount >= eventData.event_limit;
-
-        if (!eventId) {
-          throw new Error("Event ID is required");
+            if (updateCountError) throw updateCountError;
+          }
         }
 
-        // Update event registration count and active status
-        const { error: updateError } = await supabase
-          .from("events")
-          .update({
-            registration_count: newRegistrationCount,
-            active: shouldDisable ? false : eventData.active,
-          })
-          .eq("id", eventId);
-
-        if (updateError) throw updateError;
+        // Update event registration counts
+        const { error: updateRegistrationError } = await supabase.rpc("update_all_events_registration_count");
+        if (updateRegistrationError) throw updateRegistrationError;
       }
 
       // Commit the transaction

@@ -14,8 +14,8 @@ export interface Database {
           phone_no: string | null;
           attendee_id: string | null;
           payment_id: string | null;
-          event_id: string | null;
           payment_status: string | null;
+          paid_event_count: number;
         };
         Insert: {
           id?: string;
@@ -27,8 +27,8 @@ export interface Database {
           phone_no?: string | null;
           attendee_id?: string | null;
           payment_id?: string | null;
-          event_id?: string | null;
           payment_status?: string | null;
+          paid_event_count?: number;
         };
         Update: {
           id?: string;
@@ -40,12 +40,33 @@ export interface Database {
           phone_no?: string | null;
           attendee_id?: string | null;
           payment_id?: string | null;
-          event_id?: string | null;
           payment_status?: string | null;
+          paid_event_count?: number;
+        };
+        Relationships: [];
+      };
+      attendee_events: {
+        Row: {
+          attendee_id: string;
+          event_id: string;
+        };
+        Insert: {
+          attendee_id: string;
+          event_id: string;
+        };
+        Update: {
+          attendee_id?: string;
+          event_id?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "attendees_event_id_fkey";
+            foreignKeyName: "attendee_events_attendee_id_fkey";
+            columns: ["attendee_id"];
+            referencedRelation: "attendees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "attendee_events_event_id_fkey";
             columns: ["event_id"];
             referencedRelation: "events";
             referencedColumns: ["id"];
@@ -82,7 +103,7 @@ export interface Database {
           image_url?: string | null;
           max_group_size?: number | null;
           min_group_size?: number | null;
-          name?: string | null;
+          name: string | null;
           price?: number | null;
           registration_count?: number | null;
           user_id: string;
@@ -146,15 +167,27 @@ export interface Database {
     };
     Functions: {
       create_attendees_transaction: {
-        Args: object;
+        Args: Record<string, never>;
         Returns: void;
       };
       commit_transaction: {
-        Args: object;
+        Args: Record<string, never>;
+        Returns: void;
+      };
+      migrate_old_registrations: {
+        Args: Record<string, never>;
         Returns: void;
       };
       rollback_transaction: {
-        Args: object;
+        Args: Record<string, never>;
+        Returns: void;
+      };
+      sync_event_registration_counts: {
+        Args: Record<string, never>;
+        Returns: void;
+      };
+      update_all_events_registration_count: {
+        Args: Record<string, never>;
         Returns: void;
       };
     };
@@ -171,5 +204,6 @@ export type Tables<T extends keyof Database["public"]["Tables"]> = Database["pub
 export type Enums<T extends keyof Database["public"]["Enums"]> = Database["public"]["Enums"][T];
 
 export type Attendee = Tables<"attendees">;
+export type AttendeeEvent = Tables<"attendee_events">;
 export type Event = Tables<"events">;
 export type Profile = Tables<"profiles">;

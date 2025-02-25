@@ -7,7 +7,6 @@ export const attendeeSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone_no: z.string().nonempty("Phone number is required"),
   payment_id: z.string().nullable(),
-  event_id: z.string().nonempty("Event ID is required"),
   group_members: z
     .array(
       z.object({
