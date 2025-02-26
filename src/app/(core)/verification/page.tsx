@@ -8,7 +8,6 @@ import VerificationForm from "@/components/dashboard/verification/verification-f
 import QRScanner from "@/components/dashboard/qr/qr-scanner";
 import AttendeeCard from "@/components/dashboard/verification/attendee-card";
 import { getData } from "@/actions/verification";
-import QRGenerator from "@/components/dashboard/qr/qr-generator";
 
 type VerificationProps = {
   searchParams: Promise<{ email?: string }>;
@@ -20,7 +19,6 @@ export default async function VerificationPage({ searchParams }: VerificationPro
   return (
     <div className="container max-w-screen-sm mx-auto py-4">
       <h1 className="text-2xl font-bold mb-4">Attendee Verification</h1>
-      <QRGenerator />
       {!email ? (
         <Tabs defaultValue="manual">
           <TabsList>
