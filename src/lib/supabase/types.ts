@@ -3,48 +3,6 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export interface Database {
   public: {
     Tables: {
-      attendees: {
-        Row: {
-          id: string;
-          created_at: string;
-          full_name: string | null;
-          college_name: string | null;
-          department: string | null;
-          email: string | null;
-          phone_no: string | null;
-          attendee_id: string | null;
-          payment_id: string | null;
-          payment_status: string | null;
-          paid_event_count: number;
-        };
-        Insert: {
-          id?: string;
-          created_at?: string;
-          full_name?: string | null;
-          college_name?: string | null;
-          department?: string | null;
-          email?: string | null;
-          phone_no?: string | null;
-          attendee_id?: string | null;
-          payment_id?: string | null;
-          payment_status?: string | null;
-          paid_event_count?: number;
-        };
-        Update: {
-          id?: string;
-          created_at?: string;
-          full_name?: string | null;
-          college_name?: string | null;
-          department?: string | null;
-          email?: string | null;
-          phone_no?: string | null;
-          attendee_id?: string | null;
-          payment_id?: string | null;
-          payment_status?: string | null;
-          paid_event_count?: number;
-        };
-        Relationships: [];
-      };
       attendee_events: {
         Row: {
           attendee_id: string;
@@ -73,57 +31,102 @@ export interface Database {
           },
         ];
       };
+      attendees: {
+        Row: {
+          attendee_id: string | null;
+          college_name: string | null;
+          created_at: string;
+          department: string | null;
+          email: string | null;
+          full_name: string | null;
+          id: string;
+          paid_event_count: number | null;
+          payment_id: string | null;
+          payment_status: string | null;
+          phone_no: string | null;
+        };
+        Insert: {
+          attendee_id?: string | null;
+          college_name?: string | null;
+          created_at?: string;
+          department?: string | null;
+          email?: string | null;
+          full_name?: string | null;
+          id?: string;
+          paid_event_count?: number | null;
+          payment_id?: string | null;
+          payment_status?: string | null;
+          phone_no?: string | null;
+        };
+        Update: {
+          attendee_id?: string | null;
+          college_name?: string | null;
+          created_at?: string;
+          department?: string | null;
+          email?: string | null;
+          full_name?: string | null;
+          id?: string;
+          paid_event_count?: number | null;
+          payment_id?: string | null;
+          payment_status?: string | null;
+          phone_no?: string | null;
+        };
+        Relationships: [];
+      };
       events: {
         Row: {
-          id: string;
           active: boolean | null;
           category: string | null;
+          coordinator_email: string | null;
           created_at: string;
           description: string | null;
           event_limit: number | null;
           event_type: string | null;
           format: string | null;
+          id: string;
           image_url: string | null;
           max_group_size: number | null;
           min_group_size: number | null;
           name: string | null;
           price: number | null;
           registration_count: number | null;
-          user_id: string;
+          user_id: string | null;
         };
         Insert: {
-          id?: string;
           active?: boolean | null;
           category?: string | null;
+          coordinator_email?: string | null;
           created_at?: string;
           description?: string | null;
           event_limit?: number | null;
           event_type?: string | null;
           format?: string | null;
-          image_url?: string | null;
-          max_group_size?: number | null;
-          min_group_size?: number | null;
-          name: string | null;
-          price?: number | null;
-          registration_count?: number | null;
-          user_id: string;
-        };
-        Update: {
           id?: string;
-          active?: boolean | null;
-          category?: string | null;
-          created_at?: string;
-          description?: string | null;
-          event_limit?: number | null;
-          event_type?: string | null;
-          format?: string | null;
           image_url?: string | null;
           max_group_size?: number | null;
           min_group_size?: number | null;
           name?: string | null;
           price?: number | null;
           registration_count?: number | null;
-          user_id?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          active?: boolean | null;
+          category?: string | null;
+          coordinator_email?: string | null;
+          created_at?: string;
+          description?: string | null;
+          event_limit?: number | null;
+          event_type?: string | null;
+          format?: string | null;
+          id?: string;
+          image_url?: string | null;
+          max_group_size?: number | null;
+          min_group_size?: number | null;
+          name?: string | null;
+          price?: number | null;
+          registration_count?: number | null;
+          user_id?: string | null;
         };
         Relationships: [
           {
@@ -136,59 +139,66 @@ export interface Database {
       };
       profiles: {
         Row: {
-          id: string;
           avatar_url: string | null;
           email: string;
           full_name: string | null;
+          id: string;
           updated_at: string;
           username: string | null;
         };
         Insert: {
-          id: string;
           avatar_url?: string | null;
           email: string;
           full_name?: string | null;
+          id: string;
           updated_at?: string;
           username?: string | null;
         };
         Update: {
-          id?: string;
           avatar_url?: string | null;
-          email: string;
+          email?: string | null;
           full_name?: string | null;
+          id?: string;
           updated_at?: string;
           username?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey";
+            columns: ["id"];
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: {
       [_ in never]: never;
     };
     Functions: {
-      create_attendees_transaction: {
-        Args: Record<string, never>;
-        Returns: void;
-      };
       commit_transaction: {
-        Args: Record<string, never>;
-        Returns: void;
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      create_attendees_transaction: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
       migrate_old_registrations: {
-        Args: Record<string, never>;
-        Returns: void;
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
       rollback_transaction: {
-        Args: Record<string, never>;
-        Returns: void;
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
       sync_event_registration_counts: {
-        Args: Record<string, never>;
-        Returns: void;
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
       update_all_events_registration_count: {
-        Args: Record<string, never>;
-        Returns: void;
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
       };
     };
     Enums: {

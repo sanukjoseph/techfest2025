@@ -378,6 +378,7 @@ export default function EventsForm({ initialEvents }: EventsFormProps) {
                   </FormItem>
                 )}
               />
+
               <Separator />
               <div className="flex justify-end space-x-2">
                 {selectedEvent && (

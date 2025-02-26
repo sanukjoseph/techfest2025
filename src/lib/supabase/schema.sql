@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
 
--- Table: events (unchanged)
+-- Table: events (updated)
 CREATE TABLE IF NOT EXISTS public.events (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -29,12 +29,13 @@ CREATE TABLE IF NOT EXISTS public.events (
     min_group_size INTEGER DEFAULT 1,
     max_group_size INTEGER DEFAULT 5,
     registration_count INTEGER DEFAULT 0,
-    active BOOLEAN DEFAULT TRUE
+    active BOOLEAN DEFAULT TRUE,
+    coordinator_email TEXT -- Changed to single coordinator_email of type TEXT
 );
 
 ALTER TABLE public.events DISABLE ROW LEVEL SECURITY;
 
--- Table: attendees (updated)
+-- Table: attendees (unchanged)
 CREATE TABLE IF NOT EXISTS public.attendees (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
@@ -60,7 +61,7 @@ END $$;
 
 ALTER TABLE public.attendees DISABLE ROW LEVEL SECURITY;
 
--- Table: attendee_events (new)
+-- Table: attendee_events (unchanged)
 CREATE TABLE IF NOT EXISTS public.attendee_events (
     attendee_id UUID NOT NULL REFERENCES public.attendees(id) ON DELETE CASCADE,
     event_id UUID NOT NULL REFERENCES public.events(id) ON DELETE CASCADE,
@@ -96,7 +97,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function: update_all_events_registration_count (new)
+-- Function: update_all_events_registration_count (unchanged)
 CREATE OR REPLACE FUNCTION update_all_events_registration_count()
 RETURNS void AS $$
 DECLARE
@@ -114,7 +115,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function: sync_event_registration_counts (new)
+-- Function: sync_event_registration_counts (unchanged)
 CREATE OR REPLACE FUNCTION sync_event_registration_counts()
 RETURNS void AS $$
 BEGIN
@@ -122,7 +123,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Function: migrate_old_registrations (updated)
+-- Function: migrate_old_registrations (unchanged)
 CREATE OR REPLACE FUNCTION migrate_old_registrations()
 RETURNS void AS $$
 BEGIN
@@ -140,7 +141,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Update paid_event_count for existing attendees
+-- Update paid_event_count for existing attendees (unchanged)
 UPDATE public.attendees
 SET paid_event_count = (
     SELECT COUNT(*)
@@ -149,8 +150,8 @@ SET paid_event_count = (
     WHERE ae.attendee_id = attendees.id AND e.price > 0
 );
 
--- Update event registration counts
+-- Update event registration counts (unchanged)
 SELECT update_all_events_registration_count();
 
--- Migrate old registrations
+-- Migrate old registrations (unchanged)
 SELECT migrate_old_registrations();

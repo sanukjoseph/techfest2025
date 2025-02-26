@@ -59,13 +59,11 @@ export async function registerAttendees(
       let existingPaymentId = null;
 
       if (existingAttendee) {
-        if (price > 0 && existingAttendee.paid_event_count > 0) {
+        if (price > 0 && (existingAttendee.paid_event_count ?? 0) > 0) {
           return {
             error: `Attendee with email ${attendee.email} or phone ${attendee.phone_no} has already registered for a paid event.`,
           };
         }
-
-        // Check if the attendee is already registered for this event
         const { data: existingRegistration, error: registrationError } = await supabase
           .from("attendee_events")
           .select("event_id")
