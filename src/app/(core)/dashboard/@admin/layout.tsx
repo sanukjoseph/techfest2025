@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { getEventStats } from "@/actions/attendee";
-import { ADMIN_EMAIL, EVENTS_EMAIL } from "../layout";
 import { createClient } from "@/lib/supabase/client";
+import { ADMIN_EMAIL, EVENTS_EMAIL } from "@/lib/constant";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();

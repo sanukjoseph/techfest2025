@@ -3,23 +3,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { unauthorized } from "next/navigation";
 import { getEventStats } from "@/actions/attendee";
+import { ADMIN_EMAIL, EVENTS_EMAIL, FACULTY_EMAIL, VERIFICATION_EMAILS } from "@/lib/constant";
 
-export const ADMIN_EMAIL = "admin@smash.com";
-export const EVENTS_EMAIL = "event@smash.com";
-export const FACULTY_EMAIL = "faculty@smash.com";
-
-const VERIFICATION_EMAILS = ["verify@gmail.com"];
-
-export default async function DashboardLayout({
-  admin,
-  coordinator,
-  verification,
-}: {
-  children: ReactNode;
-  admin: ReactNode;
-  coordinator: ReactNode;
-  verification: ReactNode;
-}) {
+export default async function DashboardLayout({ admin, coordinator }: { children: ReactNode; admin: ReactNode; coordinator: ReactNode }) {
   const supabase = createClient();
 
   const {
@@ -33,27 +19,16 @@ export default async function DashboardLayout({
 
   const userEmail = user.email;
 
-  // Render the appropriate slot based on user role
   if (!userEmail) {
     redirect("/login");
   }
 
-  // Check if user is admin, events, or faculty
+  if (userEmail && VERIFICATION_EMAILS.includes(userEmail)) {
+    return redirect("/verification");
+  }
   const isAdminUser = userEmail && [ADMIN_EMAIL, EVENTS_EMAIL, FACULTY_EMAIL].includes(userEmail);
 
-  // Check if user is a coordinator
   const stats = await getEventStats();
   const isCoordinator = stats.eventStats.some((event) => event.coordinatorEmail === userEmail);
-
-  // Check if user has verification access
-  const hasVerificationAccess = isAdminUser || isCoordinator || (userEmail && VERIFICATION_EMAILS.includes(userEmail));
-
-  // If user doesn't have admin or coordinator access but has verification access,
-  // redirect them to the verification route
-  if (!isAdminUser && !isCoordinator && hasVerificationAccess) {
-    return <>{verification}</>;
-  }
-
-  // Otherwise, render the appropriate slot based on user role
-  return <>{isAdminUser ? admin : isCoordinator ? coordinator : verification}</>;
+  return <>{isAdminUser ? admin : isCoordinator ? coordinator : null}</>;
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { ThemeProvider } from "@/providers/theme-provider";
 import Footer from "@/components/home/Footer";
 
@@ -52,7 +52,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" forcedTheme="dark" enableSystem disableTransitionOnChange>
           <main>{children}</main>
           <Footer />
-          <Toaster />
+          <Toaster richColors position="top-center" />
         </ThemeProvider>
       </body>
     </html>

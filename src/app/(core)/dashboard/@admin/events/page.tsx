@@ -1,6 +1,6 @@
 import { getEvents } from "@/actions/events";
 import EventsForm from "@/components/events/event-form";
-import { ADMIN_EMAIL, EVENTS_EMAIL, FACULTY_EMAIL } from "../../layout";
+import { ADMIN_EMAIL, EVENTS_EMAIL, FACULTY_EMAIL } from "@/lib/constant";
 import { createClient } from "@/lib/supabase/client";
 import { redirect } from "next/navigation";
 

@@ -14,18 +14,18 @@ export default async function CoreLayout({ children }: { children: ReactNode }) 
 
   if (error) {
     console.error("Authentication error:", error);
-    redirect("/login"); // Redirect to login page
+    redirect("/login");
   }
 
   if (!user) {
     console.error("User not found");
-    notFound(); // Redirect to 404 page
+    notFound();
   }
 
   const userEmail = user?.email;
 
   return (
-    <div className="container mx-auto p-4 space-y-4 py-24">
+    <div className="container mx-auto p-4 space-y-4 py-12">
       <div className="flex items-center justify-between">
         <span className="text-2xl font-semibold">
           Welcome,
