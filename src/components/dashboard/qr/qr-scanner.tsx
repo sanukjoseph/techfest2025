@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Webcam from "react-webcam";
 import jsQR from "jsqr";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { motion } from "framer-motion";
 
 const QRScanner = () => {
-  const router = useRouter();
   const webcamRef = useRef<Webcam>(null);
   const [isCameraOn, setIsCameraOn] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +18,9 @@ const QRScanner = () => {
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState<number>(0);
   const [isBrowserSupported, setIsBrowserSupported] = useState<boolean>(true);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>(false);
+
+  const { replace } = useRouter();
+  const pathname = usePathname();
 
   // Request camera access
   const requestCameraAccess = useCallback(async () => {
@@ -68,7 +70,7 @@ const QRScanner = () => {
               if (email.includes("@")) {
                 playSuccessSound();
                 setIsCameraOn(false);
-                router.push(`/verification?email=${encodeURIComponent(email)}`);
+                replace(`${pathname}?email=${encodeURIComponent(email)}`);
               } else {
                 setError("Invalid QR code. Please try again.");
               }
@@ -77,7 +79,7 @@ const QRScanner = () => {
         };
       }
     }
-  }, [router]);
+  }, [pathname, replace]);
 
   // Switch between cameras
   const switchCamera = useCallback(() => {
