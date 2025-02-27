@@ -12,13 +12,37 @@ export const getAttendees = async (
   const supabase = await createClient();
   const offset = (page - 1) * itemsPerPage;
 
+  // let queryBuilder = supabase
+  //   .from("attendees")
+  //   .select(
+  //     `id,
+  //     full_name,
+  //     college_name,
+  //     department,
+  //     email,
+  //     phone_no,
+  //     attendee_id,
+  //     payment_status,
+  //     attendee_events!inner (
+  //       event:events (
+  //         id,
+  //         name,
+  //         price
+  //       )
+  //     )`,
+  //     { count: "exact" },
+  //   )
+  //   .range(offset, offset + itemsPerPage - 1);
+
   let queryBuilder = supabase
     .from("attendees")
     .select(
       `*,
         attendee_events!inner (
           event:events (
-            name
+            id,
+            name,
+            price
           )
         )`,
       { count: "exact" },
@@ -28,26 +52,31 @@ export const getAttendees = async (
   if (query) {
     queryBuilder = queryBuilder.ilike("full_name", `%${query}%`);
   }
-
   if (eventId) {
     queryBuilder = queryBuilder.eq("attendee_events.event_id", eventId);
   }
-
   const { data: attendees, error, count } = await queryBuilder;
-
   if (error) {
     console.error("Error fetching attendees:", error);
     return { data: [], count: 0 };
   }
-
   const formattedAttendees =
-    attendees?.map((attendee) => ({
-      ...attendee,
-      event_names: attendee.attendee_events
-        .map((ae) => ae.event?.name)
-        .filter(Boolean)
-        .join(", "),
-    })) ?? [];
+    attendees?.map((attendee) => {
+      const validEvents = attendee.attendee_events.filter((ae) => {
+        const eventPrice = ae.event?.price ?? 0;
+        const isFreeEvent = eventPrice === 0;
+        const isPaidEventWithSuccessPayment = eventPrice > 0 && attendee.payment_status === "success";
+        return isFreeEvent || isPaidEventWithSuccessPayment;
+      });
+      return {
+        ...attendee,
+        event_names: validEvents
+          .map((ae) => ae.event?.name)
+          .filter(Boolean)
+          .join(", "),
+        attendee_events: validEvents,
+      };
+    }) ?? [];
 
   return { data: formattedAttendees, count: count || 0 };
 };
