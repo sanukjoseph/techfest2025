@@ -65,22 +65,33 @@ export const getAttendees = async (
 export const getEventStats = async () => {
   const supabase = await createClient();
 
-  // Fetch all attendee_events with attendee_id and event_id, joining attendees to filter by payment_status
+  // Fetch all attendees with valid payment status
+  const { data: attendees, error: attendeeError } = await supabase
+    .from("attendees")
+    .select("id, payment_status")
+    .in("payment_status", ["success", "completed"]);
+
+  if (attendeeError) {
+    console.error("Error fetching attendees:", attendeeError);
+    return {
+      totalRegistrations: 0,
+      uniqueAttendees: 0,
+      totalEvents: 0,
+      eventStats: [],
+    };
+  }
+
+  // Fetch all attendee_events for the valid attendees
   const { data: registrations, error: regError } = await supabase
     .from("attendee_events")
-    .select(
-      `attendee_id, 
-       event_id,
-       attendee:attendees (
-         payment_status
-       )`,
-    )
-    .in("attendee.payment_status", ["success", "completed"]); // Only include attendees with valid payment status
+    .select("attendee_id, event_id")
+    .in(
+      "attendee_id",
+      attendees.map((a) => a.id),
+    );
 
-  // Fetch all events with id, name, and coordinator_email
   const { data: events, error: eventError } = await supabase.from("events").select("id, name, coordinator_email");
 
-  // Handle errors
   if (regError || eventError) {
     console.error("Error fetching stats:", regError || eventError);
     return {
@@ -91,10 +102,8 @@ export const getEventStats = async () => {
     };
   }
 
-  // Calculate unique attendees
   const uniqueAttendees = new Set(registrations.map((r) => r.attendee_id)).size;
 
-  // Map event stats
   const eventStats = events.map((event) => ({
     id: event.id,
     name: event.name,
