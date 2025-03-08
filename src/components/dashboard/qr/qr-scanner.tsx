@@ -111,7 +111,7 @@ const QRScanner = () => {
 
   // Start capturing frames when the camera is turned on
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: ReturnType<typeof setInterval>;
     if (isCameraOn && hasCameraPermission) {
       interval = setInterval(capture, 500);
     }

@@ -9,8 +9,39 @@ import { ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { squidgame } from "@/app/styles/fonts";
+import { Metadata } from "next";
 
-const EventDetailsPage = async ({ params }: { params: Promise<{ id: string }> }) => {
+interface Params {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const id = (await params).id;
+  const event = await getEvent(id);
+  if (!event?.data) {
+    return {
+      title: "Event Not Found",
+    };
+  }
+  return {
+    title: event.data.name ?? "Event Details",
+    description: event.data.description ?? undefined,
+    openGraph: {
+      title: event.data.name ?? undefined,
+      description: event.data.description ?? undefined,
+      images: event.data.image_url ? [event.data.image_url] : undefined,
+    },
+    twitter: {
+      title: event.data.name ?? undefined,
+      description: event.data.description ?? undefined,
+      images: event.data.image_url ? [event.data.image_url] : undefined,
+    },
+  };
+}
+
+const EventDetailsPage = async ({ params }: Params) => {
   const id = (await params).id;
   const event = await getEvent(id);
 
